@@ -48,20 +48,17 @@ app.get("/api/location", async (req, res) => {
 });
 
 app.get("/api/weather", async (req, res) => {
+  const ip = req.query.ip || "8.8.8.8";
   try {
-    const url = "https://geolite.info/geoip/v2.1/city/me";
-    const headers = new Headers({
-      Authorization: "Basic " + btoa(`${GEOLITEUSERNAME}:${GEOLITEPASSWORD}`),
-    });
-
-    const locationResponse = await fetch(url, { method: "GET", headers });
+    const ipApi = `https://ipapi.co/${ip}/json/`;
+    const locationResponse = await fetch(ipApi);
 
     if (!locationResponse.ok)
       throw new Error(`HTTP error! Status: ${locationResponse.status}`);
 
     const location = await locationResponse.json();
-    const lat = location?.location?.latitude;
-    const lon = location?.location?.longitude;
+    const lat = location.latitude;
+    const lon = location.longitude;
 
     const weatherApi = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPENWEATHERAPIKEY}`;
     const weatherResponse = await fetch(weatherApi);

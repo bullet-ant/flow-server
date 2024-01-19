@@ -1,0 +1,26 @@
+{
+  "name": "flow-server",
+  "version": "1.0.0",
+  "description": "Proxy server for Flow chrome extension",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bullet-ant/flow-server.git"
+  },
+  "keywords": [
+    "flow",
+    "chrome",
+    "extension"
+  ],
+  "author": "Aman Kumar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bullet-ant/flow-server/issues"
+  },
+  "homepage": "https://github.com/bullet-ant/flow-server#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}

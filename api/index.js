@@ -51,7 +51,7 @@ app.get("/api/weather", async (req, res) => {
 
     const weather = await weatherResponse.json();
 
-    res.json({ weather, geoLocation });
+    res.json(weather);
   } catch (err) {
     console.error("Error fetching location data:", err);
   }

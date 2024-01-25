@@ -1,10 +1,15 @@
 require("dotenv").config();
+const path = require("path");
 const app = require("express")();
+const cors = require("cors");
+const Reader = require("@maxmind/geoip2-node").Reader;
 
 const OPENWEATHERAPIKEY = process.env.OPENWEATHERAPIKEY;
 const GEOLITEUSERNAME = process.env.GEOLITEUSERNAME;
 const GEOLITEPASSWORD = process.env.GEOLITEPASSWORD;
 const UNSPLASHAPIKEY = process.env.UNSPLASHAPIKEY;
+
+app.use(cors());
 
 app.get("/api", (req, res) => {
   res.setHeader("Content-Type", "application/json");
@@ -28,37 +33,15 @@ app.get("/api/wallpaper", async (req, res) => {
   }
 });
 
-app.get("/api/location", async (req, res) => {
-  try {
-    const url = "https://geolite.info/geoip/v2.1/city/me";
-    const headers = new Headers({
-      Authorization: "Basic " + btoa(`${GEOLITEUSERNAME}:${GEOLITEPASSWORD}`),
-    });
-
-    const output = await fetch(url, { method: "GET", headers });
-
-    if (!output.ok) throw new Error(`HTTP error! Status: ${output.status}`);
-
-    const location = await output.json();
-
-    res.json(location);
-  } catch (err) {
-    console.error("Error fetching location data:", err);
-  }
-});
-
 app.get("/api/weather", async (req, res) => {
-  const ip = req.query.ip || "8.8.8.8";
+  const ip = req.headers["x-real-ip"] || req.socket.remoteAddress || "8.8.8.8";
+
   try {
-    const ipApi = `https://ipapi.co/${ip}/json/`;
-    const locationResponse = await fetch(ipApi);
-
-    if (!locationResponse.ok)
-      throw new Error(`HTTP error! Status: ${locationResponse.status}`);
-
-    const location = await locationResponse.json();
-    const lat = location.latitude;
-    const lon = location.longitude;
+    const dbPath = path.resolve(__dirname, "GeoLite2-City.mmdb");
+    const reader = await Reader.open(dbPath);
+    const geoLocation = reader.city(ip);
+    const lat = geoLocation.location.latitude;
+    const lon = geoLocation.location.longitude;
 
     const weatherApi = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPENWEATHERAPIKEY}`;
     const weatherResponse = await fetch(weatherApi);
@@ -68,7 +51,7 @@ app.get("/api/weather", async (req, res) => {
 
     const weather = await weatherResponse.json();
 
-    res.json(weather);
+    res.json({ weather, geoLocation });
   } catch (err) {
     console.error("Error fetching location data:", err);
   }

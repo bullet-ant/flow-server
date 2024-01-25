@@ -4,3 +4,5 @@ node_modules
 .flaskenv*
 !.env.project
 !.env.vault
+.DS_Store
+*.mmdb

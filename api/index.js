@@ -5,8 +5,6 @@ const cors = require("cors");
 const Reader = require("@maxmind/geoip2-node").Reader;
 
 const OPENWEATHERAPIKEY = process.env.OPENWEATHERAPIKEY;
-const GEOLITEUSERNAME = process.env.GEOLITEUSERNAME;
-const GEOLITEPASSWORD = process.env.GEOLITEPASSWORD;
 const UNSPLASHAPIKEY = process.env.UNSPLASHAPIKEY;
 
 app.use(cors());
@@ -18,6 +16,8 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/wallpaper", async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Cache-Control", "s-max-age=3600, stale-while-revalidate");
   try {
     const collectionId = req.query.collection_id || "Ql7C2dPpjkw";
     const unsplashApi = `https://api.unsplash.com/collections/${collectionId}/photos?client_id=${UNSPLASHAPIKEY}`;
